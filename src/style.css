@@ -24,3 +24,8 @@ body {
     -webkit-tap-highlight-color: transparent;
     margin: 0px;
 }
+
+textarea {
+    width: 800px;
+    height: 300px;
+}
