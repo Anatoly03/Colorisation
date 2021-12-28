@@ -18,7 +18,7 @@ export let ctx: CanvasRenderingContext2D
 export let keys: { [key: string]: boolean; } = {}
 
 let image = new Image()
-let m_func : Function = (r : number, g: number, b: number, a: number) => [r, g, b, a]
+let m_func: Function = (r: number, g: number, b: number, a: number) => [r, g, b, a]
 
 export let app = {
 	formula: <HTMLTextAreaElement>null,
@@ -30,10 +30,16 @@ export let app = {
 		this.canvas = document.getElementById('canvas')
 		this.link = document.getElementById('executor')
 
-		this.formula.value = 'let rn = (r + g + b) / 3\nlet gn = (r + g + b) / 3\nlet bn = (r + g + b) / 3'
+		this.formula.value = 'return [r, g, b, a];'
 
 		this.link.onclick = () => {
-			m_func = new Function('"use strict";let r=arguments[0];let g=arguments[1];let b=arguments[2];let a=arguments[3];' + this.formula.value)
+			try {
+				m_func = new Function('"use strict";let r=arguments[0];let g=arguments[1];let b=arguments[2];let a=arguments[3];' + this.formula.value)
+			} catch (e) {
+				alert(e.message);
+			}
+			
+			//console.log()
 		}
 
 		this.update()
@@ -69,7 +75,12 @@ export let app = {
 			data[i + 1] = 255 - data[i + 1]
 			data[i + 2] = 255 - data[i + 2]*/
 
-			[data[i], data[i + 1], data[i + 2], data[i + 3]] = m_func.call(data[i], data[i + 1], data[i + 2], data[i + 3])
+			const [r, g, b, a] = m_func.call(null, data[i], data[i + 1], data[i + 2], data[i + 3])
+
+			data[i + 0] = r
+			data[i + 1] = g
+			data[i + 2] = b
+			data[i + 3] = a
 		}
 
 		ctx.putImageData(imageData, 230, 30);
