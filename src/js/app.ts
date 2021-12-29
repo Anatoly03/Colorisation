@@ -49,12 +49,27 @@ export let app = {
 					let h = arguments[7]
 					let t = arguments[8]
 
-					let min = Math.min
-					let max = Math.max
-					let floor = Math.floor
-					let abs = Math.abs
-					let sin = Math.sin
-					let cos = Math.cos
+					// in: r,g,b in [0,255], out: h in [0,360) and s,l in [0,1]
+					function rgb2hsl(r,g,b) {
+						r /= 255, g /= 255, b /= 255;
+						let v=Math.max(r,g,b), c=v-Math.min(r,g,b), f=(1-Math.abs(v+v-c-1)); 
+						let h= c && ((v==r) ? (g-b)/c : ((v==g) ? 2+(b-r)/c : 4+(r-g)/c)); 
+						return [60*(h<0?h+6:h), f ? c/f : 0, (v+v-c)/2];
+					}
+
+					// input: h as an angle in [0,360] and s,v in [0,1] - output: r,g,b in [0,1]
+					function hsl2rgb(h,s,l) {
+						let a=s*Math.min(l,1-l);
+						let f= (n,k=(n+h/30)%12) => l - a*Math.max(Math.min(k-3,9-k,1),-1);
+						return [f(0)*255,f(8)*255,f(4)*255];
+					}
+
+					const min = Math.min
+					const max = Math.max
+					const floor = Math.floor
+					const abs = Math.abs
+					const sin = Math.sin
+					const cos = Math.cos
 				`
 				m_func = new Function(k + this.formula.value)
 			} catch (e) {
