@@ -20,6 +20,9 @@ export let keys: { [key: string]: boolean; } = {}
 let image = new Image()
 let m_func: Function = (r: number, g: number, b: number, a: number) => [r, g, b, a]
 
+let time_start = Date.now()
+let perf_time = 0
+
 export let app = {
 	formula: <HTMLTextAreaElement>null,
 	canvas: <HTMLCanvasElement>null,
@@ -44,18 +47,20 @@ export let app = {
 					let y = arguments[5]
 					let w = arguments[6]
 					let h = arguments[7]
+					let t = arguments[8]
 
 					let min = Math.min
 					let max = Math.max
 					let floor = Math.floor
 					let abs = Math.abs
+					let sin = Math.sin
+					let cos = Math.cos
 				`
 				m_func = new Function(k + this.formula.value)
 			} catch (e) {
 				alert(e.message);
 			}
-
-			//console.log()
+			time_start = Date.now()
 		}
 
 		this.update()
@@ -83,6 +88,8 @@ export let app = {
 		//ctx.drawImage(mod_image, 230, 30, 160, 160)
 		//ctx.drawImage(mod_image, 300, 30, 20, 20)
 
+		const processing_time_start = performance.now()
+
 		const imageData = ctx.getImageData(200, 30, 20, 20)
 		const data = imageData.data;
 
@@ -93,13 +100,19 @@ export let app = {
 
 			const [r, g, b, a] = m_func.call(null,
 				data[i], data[i + 1], data[i + 2], data[i + 3],
-				(i / 4) % imageData.width, Math.floor(i / (4 * imageData.width)), imageData.width, imageData.height)
+				(i / 4) % imageData.width, Math.floor(i / (4 * imageData.width)), imageData.width, imageData.height,
+				(Date.now() - time_start) / 1000)
 
 			data[i + 0] = r
 			data[i + 1] = g
 			data[i + 2] = b
 			data[i + 3] = a
 		}
+
+		const processing_time_end = performance.now()
+
+		if (Math.floor(Date.now() / 1000) % 5 == 0)
+			perf_time = processing_time_end - processing_time_start
 
 		ctx.putImageData(imageData, 230, 30);
 
@@ -110,6 +123,10 @@ export let app = {
 				30 + 8 * Math.floor(i / 4 / imageData.width),
 				8, 8)
 		}
+
+		ctx.fillStyle = 'white'
+		ctx.font = '12px Arial'
+		ctx.fillText(`${perf_time} ms`, 10, 15)
 	},
 	gameLoop() {
 		requestAnimationFrame(this.gameLoop.bind(this))
