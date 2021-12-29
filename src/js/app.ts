@@ -34,11 +34,27 @@ export let app = {
 
 		this.link.onclick = () => {
 			try {
-				m_func = new Function('"use strict";let r=arguments[0];let g=arguments[1];let b=arguments[2];let a=arguments[3];' + this.formula.value)
+				let k = `
+					'use strict';
+					let r = arguments[0]
+					let g = arguments[1]
+					let b = arguments[2]
+					let a = arguments[3]
+					let x = arguments[4]
+					let y = arguments[5]
+					let w = arguments[6]
+					let h = arguments[7]
+
+					let min = Math.min
+					let max = Math.max
+					let floor = Math.floor
+					let abs = Math.abs
+				`
+				m_func = new Function(k + this.formula.value)
 			} catch (e) {
 				alert(e.message);
 			}
-			
+
 			//console.log()
 		}
 
@@ -75,7 +91,9 @@ export let app = {
 			data[i + 1] = 255 - data[i + 1]
 			data[i + 2] = 255 - data[i + 2]*/
 
-			const [r, g, b, a] = m_func.call(null, data[i], data[i + 1], data[i + 2], data[i + 3])
+			const [r, g, b, a] = m_func.call(null,
+				data[i], data[i + 1], data[i + 2], data[i + 3],
+				(i / 4) % imageData.width, Math.floor(i / (4 * imageData.width)), imageData.width, imageData.height)
 
 			data[i + 0] = r
 			data[i + 1] = g
@@ -129,9 +147,3 @@ window.onload = () => {
 	app.setup()
 	app.gameLoop()
 }
-
-// 
-const getColorIndicesForCoord = (x: number, y: number, width: number) => {
-	const red = y * (width * 4) + x * 4;
-	return [red, red + 1, red + 2, red + 3];
-};
